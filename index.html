@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+	"http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Word counter</title>
+<style type="text/css">
+div.textareas textarea {
+	vertical-align: middle;
+}
+</style>
+<script type="text/javascript">
+function countWords(s, stopwords) {
+	/* Need to split up words, but NOT split on apostrophes. Solution is to 
+	   first replace punctuation we don't care about (like fullstops and 
+	   commas) with spaces, then extract all non-whitespace sequences. */
+	s = s.toLowerCase();
+	s = s.replace(/[\.\,\;\:\!\?\(\)\&]/g, ' ');
+	var re = /\S+/ig;
+	var m, word;
+	var counts = {};
+	while ((m = re.exec(s)) != null) {
+		word = m[0];
+		if (!stopwords[word]) {
+			counts[word] = (counts[word] || 0) + 1;
+		}
+	}
+	var results = [];
+	for (var word in counts) {
+		results.push([word, counts[word]]);
+	}
+	results = results.sort(function(a, b) {
+		return ((a[1] < b[1]) ? -1 : ((a[1] > b[1]) ? 1 : 0));
+	});
+	results.reverse();
+	return results;
+}
+
+window.onload = function() {
+	var input = document.getElementsByName('input')[0];
+	var output = document.getElementsByName('output')[0];
+	var results = document.getElementById('results');
+	var form = document.forms[0];
+	var stopwords = document.getElementsByName(
+		'stopwords'
+	)[0].value.split(/\s+/);
+	var stopwords_lookup = {};
+	for (var i = 0, word; word = stopwords[i]; i++) {
+		stopwords_lookup[word] = 1;
+	}
+	form.onsubmit = function() {
+		var counts = countWords(input.value, stopwords_lookup);
+		var s = '';
+		for (var i = 0; i < counts.length; i++) {
+			s += counts[i][0] + '\t' + counts[i][1] + '\n';
+		}
+		output.value = s;
+		results.style.display = 'inline';
+		return false;
+	}
+}
+</script>
+</head>
+<body>
+<h1>Word counter</h1>
+<p>Paste in text and hit "Count words" to count the number of times each word appears.</p>
+<form action="/" method="get">
+	<div class="textareas">
+		<textarea name="input" rows="40" cols="80"></textarea>
+		<span id="results" style="display: none">
+			output:
+			<textarea name="output" rows="40" cols="80"></textarea>
+		</span>
+	</div>
+	<p><input type="submit" value="Count words"></p>
+	<p>The following stop words are ignored:</p>
+	<p><textarea name="stopwords" rows="4" cols="120">a all an and are as at be but by can do for from had have if in is it me my no not of on or our s so t that the their they this to us was we who with you</textarea></p>
+</form>
+</body>
+</html>
