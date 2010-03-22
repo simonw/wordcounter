@@ -41,14 +41,14 @@ window.onload = function() {
 	var output = document.getElementsByName('output')[0];
 	var results = document.getElementById('results');
 	var form = document.forms[0];
-	var stopwords = document.getElementsByName(
-		'stopwords'
-	)[0].value.split(/\s+/);
-	var stopwords_lookup = {};
-	for (var i = 0, word; word = stopwords[i]; i++) {
-		stopwords_lookup[word] = 1;
-	}
 	form.onsubmit = function() {
+		var stopwords = document.getElementsByName(
+			'stopwords'
+		)[0].value.split(/\s+/);
+		var stopwords_lookup = {};
+		for (var i = 0, word; word = stopwords[i]; i++) {
+			stopwords_lookup[word] = 1;
+		}
 		var counts = countWords(input.value, stopwords_lookup);
 		var s = '';
 		for (var i = 0; i < counts.length; i++) {
